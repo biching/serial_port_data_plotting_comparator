@@ -1,4 +1,5 @@
 from pyqtgraph import GraphicsLayoutWidget, mkPen
+from PySide6.QtCore import QTimer
 
 
 class CustomPlotWidget(GraphicsLayoutWidget):
@@ -39,6 +40,7 @@ class CustomPlotWidget(GraphicsLayoutWidget):
         return data_pen[self.pen_idx]
 
     def renew_item(self, state, flag):
+        print(flag, state)
         if flag in self._data_flags:
             if state:
                 if self._data_item[flag] is None:
@@ -56,7 +58,22 @@ class CustomPlotWidget(GraphicsLayoutWidget):
             else:
                 self.removeItem(self._item2)
 
-    def refresh_data(self):
+    def start_plot(self):
+        self._serial_data.open_serial()
+
+        # 定时任务，将新数据刷新到图表中
+        print("parse time is set:")
+        self._timer = QTimer()
+        self._timer.timeout.connect(self.reset_data)
+        self._timer.start(10)
+        return True
+
+    def stop_plot(self):
+        self._serial_data.close_serial()
+        self._timer.stop()
+        self._timer = None
+
+    def reset_data(self):
         # 定时更新数据，并刷入到图表中
         self._serial_data.refresh_data()
         for flag in self._serial_data._data_flags:

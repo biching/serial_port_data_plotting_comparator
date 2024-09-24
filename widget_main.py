@@ -73,9 +73,9 @@ class Widget(QWidget):
         self._uart_layout.addRow("Baudrate", self._baudrate_box)
         self._baudrate_box.addItems(["115200", "9600"])
 
-        self._openclose_button = QPushButton(self.tr("OPEN"))
-        self._openclose_button.clicked.connect(self.open_close_serial)
-        self._uart_layout.addRow(self._openclose_button)
+        self._engine_button = QPushButton(self.tr("START"))
+        self._engine_button.clicked.connect(self.start_stop_engine)
+        self._uart_layout.addRow(self._engine_button)
 
         self._uart_layout.setLabelAlignment(Qt.AlignLeft)
         self._uart_groupbox.setSizePolicy(QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum))
@@ -85,8 +85,10 @@ class Widget(QWidget):
         ## height boxes
         self._height_layout = QVBoxLayout()
         self.data_boxes = {flag: QCheckBox(flag) for flag in self._plotWidget._data_flags}
-        for data_box in self.data_boxes.values():
-            data_box.checkStateChanged.connect(self.box_changed(data_box.text()))
+        for flag, data_box in self.data_boxes.items():
+            data_box.checkStateChanged.connect(
+                lambda state, flag1=flag: self.box_changed(state, flag1)
+            )  # lambda 表达式延迟赋值作妖
             # data_box.setChecked(True)
             self._height_layout.addWidget(data_box)
 
@@ -96,7 +98,7 @@ class Widget(QWidget):
         ## vario box
         self._vario_box = QCheckBox("V")
         self._vario_box.setChecked(True)
-        self._vario_box.checkStateChanged.connect(self.box_changed("V"))
+        self._vario_box.stateChanged.connect(lambda state, flag="v": self.box_changed(state, flag))
         self._vario_box.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
 
         ## 左下-组装
@@ -116,27 +118,24 @@ class Widget(QWidget):
             widget.show()
 
     @Slot()
-    def box_changed(self, flag):
-        if flag in self.data_boxes:
-            state = self.data_boxes[flag].isChecked()
-        else:
-            state = self._vario_box.isChecked()
-        self._plotWidget.renew_item(state, flag)
+    def box_changed(self, state, flag):
+        self._plotWidget.renew_item(state == Qt.CheckState.Checked, flag)
+        print(f"state: {state == Qt.CheckState.Checked}; flag: {flag}")
 
     @Slot()
-    def open_close_serial(self):
+    def start_stop_engine(self):
         if self.busy:
             return
         self.busy = True
 
-        if self._openclose_button.text() == self.tr("OPEN"):
+        if self._engine_button.text() == self.tr("START"):
             self.parentWidget().statusBar().showMessage("Serial Connectting")
-            if self._plotWidget._serial_data.open_serial():
-                self._openclose_button.setText(self.tr("CLOSE"))
+            if self._plotWidget.start_plot():
+                self._engine_button.setText(self.tr("STOP"))
                 self.parentWidget().statusBar().showMessage("Serial Connected")
         else:
-            self._plotWidget._serial_data.close_serial()
-            self._openclose_button.setText(self.tr("OPEN"))
+            self._plotWidget.stop_plot()
+            self._engine_button.setText(self.tr("START"))
             self.parentWidget().statusBar().showMessage("Serial closed")
 
         self.busy = False

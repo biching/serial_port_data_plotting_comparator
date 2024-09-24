@@ -9,7 +9,6 @@ import array
 import serial
 import numpy as np
 import threading
-from PySide6.QtCore import QTimer
 import serial.tools.list_ports
 
 from enum import Enum
@@ -42,9 +41,6 @@ class SerialData:
         self.portx = "/dev/cu.usbserial-14130"
         self.baudrate = 115200
 
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.refresh_data)
-
     def open_serial(self):
         self.com.port = self.portx
         self.com.baudrate = self.baudrate
@@ -60,15 +56,11 @@ class SerialData:
         self._serial_status = ConnStatus.CONNECTED
 
         try:
-            self.serial_thread = threading.Thread(target=self.Serial)
+            self.serial_thread = threading.Thread(target=self.serial_read)
             self.serial_thread.setDaemon(True)
             self.serial_thread.start()
         except Exception as e:
             print("serial thread error:", e)
-
-        # 定时任务，将新数据刷新到图表中
-        print("parse time is set:")
-        self.timer.start(50)
 
         return True
 
@@ -81,13 +73,10 @@ class SerialData:
         except Exception as e:
             print("serial thread join error:", e)
 
-        self.timer.stop()
-        print("parse time is set:")
-
         self.com.close()
         print("serial com is closed:")
 
-    def Serial(self):
+    def serial_read(self):
         ret = b""
         while self._serial_status == ConnStatus.CONNECTED:
             n = self.com.inWaiting()
@@ -103,11 +92,18 @@ class SerialData:
                     except Exception as e:
                         print("decode error:", e)
                         continue
-                    data = self.parse_input(data_get)
+                    data = self.parse_line(data_get)
                     if data is None:
                         print("parse error, data is %s" % data_get)
+                    else:
+                        flag, item = data
+                        if flag in self._data_flags:
+                            self._queues[flag].put(item)
+        else:
+            print("flag error")
+            return None
 
-    def parse_input(self, data):
+    def parse_line(self, data):
         if not data.startswith("$"):
             return None
         items = data[1:-2].split(":")
@@ -115,24 +111,17 @@ class SerialData:
             print("fields num is not right")
             return None
         try:
-            tag = items[0]
+            flag = items[0]
             item = float(items[1])
         except Exception as e:
             print("format error", e)
             return None
-
-        if tag in self._data_flags:
-            self._queues[tag].put(item)
-        else:
-            print("tag error")
-            return None
-
-        # print(tag, item)
-
-        return True
+        return flag, item
 
     def refresh_data(self):
         for flag in self._data_flags:
+            if self._queues[flag].empty():
+                continue
             if self.idx < self._data_size:
                 self._data[flag][self.idx] = self._queues[flag].get()
                 # 将第一个数据赋值给所有位置，以便图表尽早做自适应调整y轴显示范围
