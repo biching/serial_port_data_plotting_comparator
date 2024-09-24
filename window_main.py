@@ -25,7 +25,7 @@ class MainWindow(QMainWindow):
 
     def createActions(self):
         self._new_act = QAction(
-            QIcon.fromTheme(QIcon.ThemeIcon.DocumentProperties),
+            QIcon.fromTheme(QIcon.ThemeIcon.GoPrevious),
             "&Setting",
             self,
             shortcut=QKeySequence.Preferences,

@@ -1,3 +1,4 @@
+from datetime import datetime
 from pyqtgraph import GraphicsLayoutWidget, mkPen
 from PySide6.QtCore import QTimer
 
@@ -5,11 +6,15 @@ from PySide6.QtCore import QTimer
 class CustomPlotWidget(GraphicsLayoutWidget):
     def __init__(self, serial_data):
         super().__init__()
+        self._timer = QTimer()
+        self._timer.timeout.connect(self.reset_data)
+
         self._serial_data = serial_data
         # 前n-1个在一个图里面，最后一个在另一个里面
         self._data_flags = self._serial_data._data_flags[:-1]
         self._data_item = {flag: None for flag in self._data_flags}
         self.pen_idx = 0
+        self.refresh_interval_millisec = 30
 
         # return PlotItem
         self._item1 = self.addPlot(title="height plotting")
@@ -63,10 +68,17 @@ class CustomPlotWidget(GraphicsLayoutWidget):
 
         # 定时任务，将新数据刷新到图表中
         print("parse time is set:")
-        self._timer = QTimer()
-        self._timer.timeout.connect(self.reset_data)
-        self._timer.start(10)
+        self._timer.start(self.refresh_interval_millisec)
         return True
+
+    def set_data_refresh_interval(self, value):
+        print(f"set_data_refresh_interval: {value}")
+        self.refresh_interval_millisec = value
+        self._timer.setInterval(self.refresh_interval_millisec)
+        if self._timer.isActive():
+            print(f"restart timer")
+            self._timer.stop()
+            self._timer.start()
 
     def stop_plot(self):
         self._serial_data.close_serial()

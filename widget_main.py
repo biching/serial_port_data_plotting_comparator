@@ -8,6 +8,8 @@ from PySide6.QtWidgets import (
     QFormLayout,
     QPushButton,
     QComboBox,
+    QLineEdit,
+    QLabel,
 )
 from PySide6.QtCore import Slot, Qt, Signal
 import threading
@@ -28,6 +30,8 @@ class Widget(QWidget):
         # 左上： 设置界面
         self.create_uart_group()
 
+        self.create_plot_setting_group()
+
         # 左下: 数据选择器（selector）
         self.create_selector_group()
 
@@ -37,9 +41,10 @@ class Widget(QWidget):
         self._setting_layout = QVBoxLayout()
         # self._left_layout.addLayout(self._setting_layout)
         self._setting_layout.addWidget(self._uart_groupbox)
+        self._setting_layout.addStretch(1)
+        self._setting_layout.addWidget(self._plot_setting_groupbox)
+        self._setting_layout.addStretch(2)
         self._setting_layout.addWidget(self._selector_groupbox)
-        self._setting_layout.insertSpacing(1, 50)
-        self._setting_layout.setAlignment(Qt.AlignTop)
         self._setting_groupbox.setLayout(self._setting_layout)
 
         # 总组装
@@ -78,7 +83,24 @@ class Widget(QWidget):
         self._uart_layout.addRow(self._engine_button)
 
         self._uart_layout.setLabelAlignment(Qt.AlignLeft)
-        self._uart_groupbox.setSizePolicy(QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum))
+        self._uart_groupbox.setSizePolicy(QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred))
+
+    def create_plot_setting_group(self):
+
+        self._plot_setting_layout = QFormLayout()
+        self._plot_setting_layout.setHorizontalSpacing(25)
+        self._plot_setting_layout.setFormAlignment(Qt.AlignJustify)
+
+        self._refresh_data_interval_box = QLineEdit("30")
+        self._refresh_data_interval_box.textChanged.connect(self.refresh_data_interval_changed)
+        self._refresh_data_interval_box.setFixedWidth(50)
+        self._refresh_data_interval_label = QLabel("Plot Interval")
+        self._refresh_data_interval_label.setToolTip("data refresh interval (ms)")
+        self._plot_setting_layout.addRow(self._refresh_data_interval_label, self._refresh_data_interval_box)
+
+        self._plot_setting_groupbox = QGroupBox("Plot Setting")
+        self._plot_setting_groupbox.setSizePolicy(QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred))
+        self._plot_setting_groupbox.setLayout(self._plot_setting_layout)
 
     def create_selector_group(self):
 
@@ -108,7 +130,7 @@ class Widget(QWidget):
         self._selector_layout.addWidget(self._vario_box)
         self._selector_groupbox.setLayout(self._selector_layout)
 
-        self._selector_groupbox.setSizePolicy(QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum))
+        self._selector_groupbox.setSizePolicy(QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred))
 
     def toggle_setting(self):
         widget = self._setting_groupbox
@@ -159,3 +181,6 @@ class Widget(QWidget):
 
     def baudrate_changed(self, idx):
         self._plotWidget._serial_data.paudrate = self._baudrate_box.currentText()
+
+    def refresh_data_interval_changed(self, text):
+        self._plotWidget.set_data_refresh_interval(int(text))
