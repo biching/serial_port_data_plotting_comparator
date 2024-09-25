@@ -15,15 +15,16 @@ from PySide6.QtCore import Slot, Qt, Signal
 import threading
 
 from widget_combo_box import ComboBox
+from widget_plot import CustomPlotWidget
 
 
 class Widget(QWidget):
     showSerialComboboxSignal = Signal(list)
 
-    def __init__(self, plotWidget):
+    def __init__(self):
         super().__init__()
         self.setWindowTitle("UART PLOT")
-        self._plotWidget = plotWidget
+        self._plotWidget = CustomPlotWidget()
         self.busy = False
         self.showSerialComboboxSignal.connect(self.showSerialPortCombobox)
 
@@ -91,7 +92,7 @@ class Widget(QWidget):
         self._plot_setting_layout.setHorizontalSpacing(25)
         self._plot_setting_layout.setFormAlignment(Qt.AlignJustify)
 
-        self._refresh_data_interval_box = QLineEdit("30")
+        self._refresh_data_interval_box = QLineEdit(str(self._plotWidget._refresh_interval_millisec))
         self._refresh_data_interval_box.textChanged.connect(self.refresh_data_interval_changed)
         self._refresh_data_interval_box.setFixedWidth(50)
         self._refresh_data_interval_label = QLabel("Plot Interval")

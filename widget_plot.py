@@ -1,20 +1,18 @@
-from datetime import datetime
 from pyqtgraph import GraphicsLayoutWidget, mkPen
 from PySide6.QtCore import QTimer
+from data_serial import SerialData
 
 
 class CustomPlotWidget(GraphicsLayoutWidget):
-    def __init__(self, serial_data):
+    def __init__(self):
         super().__init__()
         self._timer = QTimer()
         self._timer.timeout.connect(self.reset_data)
-
-        self._serial_data = serial_data
-        # 前n-1个在一个图里面，最后一个在另一个里面
-        self._data_flags = self._serial_data._data_flags[:-1]
+        self._data_flags = ["x", "y", "z"]
+        self._serial_data = SerialData(self._data_flags)
         self._data_item = {flag: None for flag in self._data_flags}
-        self.pen_idx = 0
-        self.refresh_interval_millisec = 30
+        self._pen_idx = 0
+        self._refresh_interval_millisec = 50
 
         # return PlotItem
         self._item1 = self.addPlot(title="height plotting")
@@ -39,10 +37,10 @@ class CustomPlotWidget(GraphicsLayoutWidget):
             mkPen(cosmetic=True, width=1.0, color="b"),
             mkPen(cosmetic=True, width=1.0, color="y"),
         ]
-        self.pen_idx += 1
-        if self.pen_idx >= len(data_pen):
-            self.pen_idx %= len(data_pen)
-        return data_pen[self.pen_idx]
+        self._pen_idx += 1
+        if self._pen_idx >= len(data_pen):
+            self._pen_idx %= len(data_pen)
+        return data_pen[self._pen_idx]
 
     def renew_item(self, state, flag):
         print(flag, state)
@@ -68,13 +66,13 @@ class CustomPlotWidget(GraphicsLayoutWidget):
 
         # 定时任务，将新数据刷新到图表中
         print("parse time is set:")
-        self._timer.start(self.refresh_interval_millisec)
+        self._timer.start(self._refresh_interval_millisec)
         return True
 
     def set_data_refresh_interval(self, value):
         print(f"set_data_refresh_interval: {value}")
-        self.refresh_interval_millisec = value
-        self._timer.setInterval(self.refresh_interval_millisec)
+        self._refresh_interval_millisec = value
+        self._timer.setInterval(self._refresh_interval_millisec)
         if self._timer.isActive():
             print(f"restart timer")
             self._timer.stop()
@@ -83,12 +81,11 @@ class CustomPlotWidget(GraphicsLayoutWidget):
     def stop_plot(self):
         self._serial_data.close_serial()
         self._timer.stop()
-        self._timer = None
 
     def reset_data(self):
         # 定时更新数据，并刷入到图表中
         self._serial_data.refresh_data()
-        for flag in self._serial_data._data_flags:
+        for flag in self._serial_data._data_flags_extend:
             if flag == "v":
                 self._item2_data_v.setData(self._serial_data._data[flag])
             elif self._data_item[flag] is not None:

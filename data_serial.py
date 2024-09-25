@@ -1,11 +1,5 @@
 from queue import Queue
-import os
-import sys
 import time
-import signal
-import string
-import pyqtgraph as pg
-import array
 import serial
 import numpy as np
 import threading
@@ -24,13 +18,13 @@ class ConnStatus(Enum):
 class SerialData:
 
     def __init__(self, data_flags):
-        self._data_flags = data_flags
+        self._data_flags_extend = data_flags + ["v"]
         self._serial_status = ConnStatus.LOSE
-        self._queues = {flag: Queue(maxsize=0) for flag in self._data_flags}
+        self._queues = {flag: Queue(maxsize=0) for flag in self._data_flags_extend}
 
         # 初始化展示数据
         self._data_size = 120
-        self._data = {flag: np.zeros(self._data_size) for flag in self._data_flags}
+        self._data = {flag: np.zeros(self._data_size) for flag in self._data_flags_extend}
 
         self.idx = 0
 
@@ -97,7 +91,7 @@ class SerialData:
                         print("parse error, data is %s" % data_get)
                     else:
                         flag, item = data
-                        if flag in self._data_flags:
+                        if flag in self._data_flags_extend:
                             self._queues[flag].put(item)
         else:
             print("flag error")
@@ -119,18 +113,18 @@ class SerialData:
         return flag, item
 
     def refresh_data(self):
-        for flag in self._data_flags:
+        for flag in self._data_flags_extend:
             if self._queues[flag].empty():
-                continue
+                return  # 四个flag的数据一起过来
             if self.idx < self._data_size:
                 self._data[flag][self.idx] = self._queues[flag].get()
                 # 将第一个数据赋值给所有位置，以便图表尽早做自适应调整y轴显示范围
                 if self.idx == 0:
                     self._data[flag].fill(self._data[flag][self.idx])
-                self.idx += 1
             else:
                 self._data[flag][:-1] = self._data[flag][1:]
-                self._data[flag][self.idx - 1] = self._queues[flag].get()
+                self._data[flag][-1] = self._queues[flag].get()
+        self.idx += 1
 
     def detect_serial_port(self):  # 检测串口
         items = []
