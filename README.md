@@ -1,17 +1,17 @@
 # serial_com_data_plot
 
-function: read data from serial com, then plot it
+Function: read data from serial com, then plot it
 - create UI and function with pyside6; 
 - plot data with pyQtGraph 
 
 # How to use
-
 
 ##  Use case on Mac
 show setting the UI:
 ![screenshot](resource/ShowSetting.png)
 Hide setting and diselect the v data the UI
 ![screenshot](resource/HideSetting.png)
+=======
 
 ## The input data(serial port data stream) format is simple like this:
 
