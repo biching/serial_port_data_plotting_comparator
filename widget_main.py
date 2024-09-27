@@ -70,7 +70,7 @@ class Widget(QWidget):
         self._uart_layout = QFormLayout(self._uart_groupbox)
 
         self._portx_box = ComboBox(self._uart_groupbox)
-        # self.refresh_serial_port()
+        self.refresh_serial_port()
         self._portx_box.clicked.connect(self.refresh_serial_port)
         self._portx_box.currentIndexChanged.connect(self.serial_port_changed)
         self._uart_layout.addRow("Port", self._portx_box)
@@ -175,6 +175,7 @@ class Widget(QWidget):
     def showSerialPortCombobox(self, items):
         self._portx_box.clear()
         self._portx_box.addItems(items)
+        self._portx_box.setCurrentIndex(len(items) - 1)
 
     def serial_port_changed(self, idx):
         port = self._portx_box.currentText().split(" ")[0]

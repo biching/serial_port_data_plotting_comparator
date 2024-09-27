@@ -13,7 +13,7 @@ if __name__ == "__main__":
     widget = Widget()
 
     mainWindow = MainWindow(widget)
-    mainWindow.resize(1200, 500)
+    mainWindow.resize(1600, 800)
     mainWindow.show()
 
     sys.exit(app.exec())
