@@ -13,7 +13,7 @@ function: read data from serial com, then plot it
 
 ## the input data(serial port data stream) format is simple like this:
 
->```
+>```shell
 > $x:-3257.31
 > $y:-3257.14
 > $z:-3078.99
@@ -23,13 +23,13 @@ function: read data from serial com, then plot it
 ## deploment for mac
 
 Install the PyInstaller via pip with the following command:
-> ```
+>```shell
 > pip install pyinstaller
 > ```
 
 
 Then package the application with the following command in the root directory:
-> ```
+> ```shell
 > pyinstaller --name="Serial Plotter" --windowed --icon resource/icon.icns  main.py
 > ```
 You can find the packaged application in the dist folder.
