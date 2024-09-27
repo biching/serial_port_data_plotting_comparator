@@ -1,15 +1,17 @@
 # serial_com_data_plot
---------
+
 function: read data from serial com, then plot it
 - create UI and function with pyside6; 
 - plot data with pyQtGraph 
 
 # How to use
---------
+
 
 ## screenshot for mac
-
-![screenshot](resource/screenShot.jpg)
+show setting the UI:
+![screenshot](resource/showsetting.png)
+Hide setting the UI
+![screenshot](resource/hidesetting.png)
 
 ## the input data(serial port data stream) format is simple like this:
 
@@ -35,7 +37,7 @@ Then package the application with the following command in the root directory:
 You can find the packaged application in the dist folder.
 
 # Thanks
---------
+
 
 [COMTool](https://github.com/neutree/COMTool)
 
