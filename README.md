@@ -14,7 +14,7 @@ Install the PyInstaller via pip with the following command:
 
 Then package the application with the following command in the root directory:
 
-> pyinstaller --name="SerialPlot" --windowed --icon chicken.icns  main.py
+> pyinstaller --name="Serial Plotter" --windowed --icon icon.icns  main.py
 
 You can find the packaged application in the dist folder.
 
@@ -22,4 +22,4 @@ You can find the packaged application in the dist folder.
 
 [COMTool](https://github.com/neutree/COMTool)
 
-comtool is very useful tool for serial port data reading, but it's graph plugin for mac is not working. That's why I made this tool.
+comtool is very useful tool for serial port data reading, but it's graph plugin for mac is not working. That's why I made this clean tool.
