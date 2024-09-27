@@ -3,7 +3,14 @@ read data from serial com, then plot it, using pyside6 &amp; pyqt
 
 ### screenshot for mac
 
-![screenshot](screenShot.jpg)
+![screenshot](resource/screenShot.jpg)
+
+### the input data(serial port data stream) format is simple like this:
+
+> $x:-3257.31
+> $y:-3257.14
+> $z:-3078.99
+> $v:-3.62
 
 ### deploment for mac
 
@@ -14,7 +21,7 @@ Install the PyInstaller via pip with the following command:
 
 Then package the application with the following command in the root directory:
 
-> pyinstaller --name="Serial Plotter" --windowed --icon icon.icns  main.py
+> pyinstaller --name="Serial Plotter" --windowed --icon resource/icon.icns  main.py
 
 You can find the packaged application in the dist folder.
 
