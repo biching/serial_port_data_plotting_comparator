@@ -28,19 +28,14 @@ class SerialData:
 
         self.idx = 0
 
-        self.serial_init()
-
-    def serial_init(self):
+        # serial_init
         self.com = serial.Serial()
-        self.portx = "/dev/cu.usbserial-14130"
-        self.baudrate = 115200
+        self.com.port = "/dev/cu.usbserial-14130"
+        self.com.baudrate = 112500
 
     def open_serial(self):
-        self.com.port = self.portx
-        self.com.baudrate = self.baudrate
-
-        print("open serial \nport:", self.portx)
-        print("baudrate:", self.baudrate)
+        print("open serial \nport:", self.com.port)
+        print("baudrate:", self.com.baudrate)
 
         try:
             self.com.open()

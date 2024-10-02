@@ -18,7 +18,7 @@ class CustomPlotWidget(GraphicsLayoutWidget):
         self._item1 = self.addPlot(title="height plotting")
         self._item1.addLegend(offset=(1, 1))
         self._item1.showGrid(x=True, y=True)
-        self._item1.enableAutoRange("y")
+        self._item1.enableAutoRange()
         self._item1.setLabel(axis="left", text="y-height")
         self._item1.setTitle("height Chart")
 
@@ -26,7 +26,7 @@ class CustomPlotWidget(GraphicsLayoutWidget):
 
         self._item2 = self.addPlot(title="climb rate plotting")
         self._item2.showGrid(x=True, y=True)
-        self._item2.enableAutoRange("y")
+        self._item2.enableAutoRange()
         self._item2.setLabel(axis="left", text="y-vario")
         self._item2_data_v = self._item2.plot(self._serial_data._data["v"], pen=self.get_pen(), name="v")
 
@@ -44,21 +44,21 @@ class CustomPlotWidget(GraphicsLayoutWidget):
 
     def renew_item(self, state, flag):
         print(flag, state)
-        if flag in self._data_flags:
-            if state:
-                if self._data_item[flag] is None:
-                    self._data_item[flag] = self._item1.plot(
-                        self._serial_data._data[flag], pen=self.get_pen(), name=flag
-                    )
-                else:
-                    self._item1.addItem(self._data_item[flag])
+        if state:
+            if self._data_item[flag] is None:
+                self._data_item[flag] = self._item1.plot(self._serial_data._data[flag], pen=self.get_pen(), name=flag)
             else:
-                self._item1.removeItem(self._data_item[flag])
+                self._item1.addItem(self._data_item[flag])
         else:
-            if state:
-                self.nextRow()
-                self.addItem(self._item2)
-            else:
+            self._item1.removeItem(self._data_item[flag])
+
+    def renew_item_v(self, state):
+        print("v:", state)
+        if state:
+            self.nextRow()
+            self.addItem(self._item2)
+        else:
+            if self._item2 in self.items():
                 self.removeItem(self._item2)
 
     def start_plot(self):

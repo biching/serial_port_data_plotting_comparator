@@ -119,9 +119,9 @@ class Widget(QWidget):
         # self.axis_y_selector.setLayout(self._select_vbox)
 
         ## vario box
-        self._vario_box = QCheckBox("V")
+        self._vario_box = QCheckBox("v")
         self._vario_box.setChecked(True)
-        self._vario_box.stateChanged.connect(lambda state, flag="v": self.box_changed(state, flag))
+        self._vario_box.checkStateChanged.connect(self.box_changed_v)
         self._vario_box.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
 
         ## 左下-组装
@@ -144,6 +144,11 @@ class Widget(QWidget):
     def box_changed(self, state, flag):
         self._plotWidget.renew_item(state == Qt.CheckState.Checked, flag)
         print(f"state: {state == Qt.CheckState.Checked}; flag: {flag}")
+
+    @Slot()
+    def box_changed_v(self, state):
+        self._plotWidget.renew_item_v(state == Qt.CheckState.Checked)
+        print(f"V state: {state == Qt.CheckState.Checked};")
 
     @Slot()
     def start_stop_engine(self):
@@ -179,10 +184,11 @@ class Widget(QWidget):
 
     def serial_port_changed(self, idx):
         port = self._portx_box.currentText().split(" ")[0]
-        self._plotWidget._serial_data.portx = port
+        self._plotWidget._serial_data.com.port = port
 
     def baudrate_changed(self, idx):
-        self._plotWidget._serial_data.paudrate = self._baudrate_box.currentText()
+        self._plotWidget._serial_data.com.baudrate = self._baudrate_box.currentText()
+        print(self._plotWidget._serial_data.com.baudrate)
 
     def refresh_data_interval_changed(self, text):
         self._plotWidget.set_data_refresh_interval(int(text))
