@@ -18,13 +18,13 @@ class ConnStatus(Enum):
 class SerialData:
 
     def __init__(self, data_flags):
-        self._data_flags_extend = data_flags + ["v"]
+        self._data_flags = data_flags
         self._serial_status = ConnStatus.LOSE
-        self._queues = {flag: Queue(maxsize=0) for flag in self._data_flags_extend}
+        self._queues = {flag: Queue(maxsize=0) for flag in self._data_flags}
 
         # 初始化展示数据
         self._data_size = 120
-        self._data = {flag: np.zeros(self._data_size) for flag in self._data_flags_extend}
+        self._data = {flag: np.zeros(self._data_size) for flag in self._data_flags}
 
         self.idx = 0
 
@@ -86,7 +86,7 @@ class SerialData:
                         print("parse error, data is %s" % data_get)
                     else:
                         flag, item = data
-                        if flag in self._data_flags_extend:
+                        if flag in self._data_flags:
                             self._queues[flag].put(item)
         else:
             print("flag error")
@@ -108,7 +108,7 @@ class SerialData:
         return flag, item
 
     def refresh_data(self):
-        for flag in self._data_flags_extend:
+        for flag in self._data_flags:
             if self._queues[flag].empty():
                 return  # 四个flag的数据一起过来
             if self.idx < self._data_size:

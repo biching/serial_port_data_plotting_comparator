@@ -1,25 +1,33 @@
-# serial_com_data_plot
+# serial_com_data_plotting_comparator
 
-Function: read data from serial com, then plot it
-- create UI and function with pyside6; 
+Function: continuously reading multiple set of data from serial com, plotting them, and making camparison.
+- create UI and interaction functions with pyside6（QT for python）; 
 - plot data with pyQtGraph 
 
 # How to use
 
 ##  Use case on Mac
 show setting the UI:
-![screenshot](resource/ShowSetting.png)
-Hide setting and diselect the v data the UI
-![screenshot](resource/HideSetting.png)
+![screenshot](resource/Full.jpg)
+
+diselect all the item from group2
+![screenshot](resource/DisselectAllGroup2.jpg)
+
+Hide setting
+![screenshot](resource/HideSetting.jpg)
 =======
 
 ## The input data(serial port data stream) format is simple like this:
 
->```shell
-> $x:-3257.31
-> $y:-3257.14
-> $z:-3078.99
-> $v:-3.62
+>```shell 
+> // group 1(must)
+> $x1:-3257.31
+> $y1:-3257.14
+> $z1:-3257.14
+> // group 2(option)
+> $x2:-3257.31
+> $y2:-3257.14
+> $z2:-3257.14
 >```
 
 ## Deploment for mac

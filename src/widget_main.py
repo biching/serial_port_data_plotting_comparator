@@ -10,9 +10,11 @@ from PySide6.QtWidgets import (
     QComboBox,
     QLineEdit,
     QLabel,
+    QSpacerItem,
 )
 from PySide6.QtCore import Slot, Qt, Signal
 import threading
+from enum import Enum
 
 from widget_combo_box import ComboBox
 from widget_plot import CustomPlotWidget
@@ -40,12 +42,14 @@ class Widget(QWidget):
         # self._setting_groupbox = QGroupBox("Setting")
         self._setting_groupbox = QWidget()
         self._setting_layout = QVBoxLayout()
-        # self._left_layout.addLayout(self._setting_layout)
+        # spacer的横向不影响其他排序就行，纵向最高60，可被压缩
+        spcaceItem = QSpacerItem(10, 60, QSizePolicy.Preferred, QSizePolicy.Maximum)
         self._setting_layout.addWidget(self._uart_groupbox)
-        self._setting_layout.addStretch(1)
+        self._setting_layout.addSpacerItem(spcaceItem)
         self._setting_layout.addWidget(self._plot_setting_groupbox)
-        self._setting_layout.addStretch(2)
+        self._setting_layout.addSpacerItem(spcaceItem)
         self._setting_layout.addWidget(self._selector_groupbox)
+        self._setting_layout.addStretch()
         self._setting_groupbox.setLayout(self._setting_layout)
 
         # 总组装
@@ -103,32 +107,39 @@ class Widget(QWidget):
         self._plot_setting_groupbox.setSizePolicy(QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred))
         self._plot_setting_groupbox.setLayout(self._plot_setting_layout)
 
+    class FlagGroup(Enum):
+        G1 = "1"
+        G2 = "2"
+
+        # flag should be: x1, x2, y1, y2...
+        def is_belong_me(self, flag):
+            if len(flag) != 2:
+                return False
+            return self.value == flag[1]
+
     def create_selector_group(self):
 
-        ## height boxes
-        self._height_layout = QVBoxLayout()
+        ## selectors-定义
+        self._selector_group1_layout = QVBoxLayout()
+        self._selector_group2_layout = QVBoxLayout()
         self.data_boxes = {flag: QCheckBox(flag) for flag in self._plotWidget._data_flags}
         for flag, data_box in self.data_boxes.items():
             data_box.checkStateChanged.connect(
+                # checkStateChanged的信号 会自动将changed state传给lambda的第一个变量
                 lambda state, flag1=flag: self.box_changed(state, flag1)
-            )  # lambda 表达式延迟赋值作妖
+            )  # lambda 表达式在循环中延迟赋值，导致此处不能简化为lambda: self.box_changed(state, flag)
             # data_box.setChecked(True)
-            self._height_layout.addWidget(data_box)
+            if self.FlagGroup.G1.is_belong_me(flag):
+                self._selector_group1_layout.addWidget(data_box)
 
-        # self.axis_y_selector = QGroupBox(self._selector_layout)
-        # self.axis_y_selector.setLayout(self._select_vbox)
+            if self.FlagGroup.G2.is_belong_me(flag):
+                self._selector_group2_layout.addWidget(data_box)
 
-        ## vario box
-        self._vario_box = QCheckBox("v")
-        self._vario_box.setChecked(True)
-        self._vario_box.checkStateChanged.connect(self.box_changed_v)
-        self._vario_box.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-
-        ## 左下-组装
+        ## selectors-组装
         self._selector_groupbox = QGroupBox("Data selector")
         self._selector_layout = QHBoxLayout()
-        self._selector_layout.addLayout(self._height_layout)
-        self._selector_layout.addWidget(self._vario_box)
+        self._selector_layout.addLayout(self._selector_group1_layout)
+        self._selector_layout.addLayout(self._selector_group2_layout)
         self._selector_groupbox.setLayout(self._selector_layout)
 
         self._selector_groupbox.setSizePolicy(QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred))
@@ -142,13 +153,11 @@ class Widget(QWidget):
 
     @Slot()
     def box_changed(self, state, flag):
-        self._plotWidget.renew_item(state == Qt.CheckState.Checked, flag)
+        if self.FlagGroup.G1.is_belong_me(flag):
+            self._plotWidget.renew_plot_group1(state == Qt.CheckState.Checked, flag)
+        if self.FlagGroup.G2.is_belong_me(flag):
+            self._plotWidget.renew_plot_group2(state == Qt.CheckState.Checked, flag)
         print(f"state: {state == Qt.CheckState.Checked}; flag: {flag}")
-
-    @Slot()
-    def box_changed_v(self, state):
-        self._plotWidget.renew_item_v(state == Qt.CheckState.Checked)
-        print(f"V state: {state == Qt.CheckState.Checked};")
 
     @Slot()
     def start_stop_engine(self):
@@ -174,6 +183,7 @@ class Widget(QWidget):
         t.start()
 
     def detect_serial_port_process(self):
+        self.parentWidget().statusBar().showMessage("detect serial port")
         items = self._plotWidget._serial_data.detect_serial_port()
         self.showSerialComboboxSignal.emit(items)
 
@@ -185,10 +195,12 @@ class Widget(QWidget):
     def serial_port_changed(self, idx):
         port = self._portx_box.currentText().split(" ")[0]
         self._plotWidget._serial_data.com.port = port
+        self.parentWidget().statusBar().showMessage("port changed")
 
     def baudrate_changed(self, idx):
         self._plotWidget._serial_data.com.baudrate = self._baudrate_box.currentText()
-        print(self._plotWidget._serial_data.com.baudrate)
+        self.parentWidget().statusBar().showMessage("baudrate changed")
 
     def refresh_data_interval_changed(self, text):
         self._plotWidget.set_data_refresh_interval(int(text))
+        self.parentWidget().statusBar().showMessage("data refresh interval changed")
