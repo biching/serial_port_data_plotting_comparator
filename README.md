@@ -1,20 +1,28 @@
 # serial_com_data_plotting_comparator
 
-Function: continuously reading multiple set of data from serial com, plotting them, and making camparison.
-- create UI and interaction functions with pyside6（QT for python）; 
-- plot data with pyQtGraph 
+### Function: 
+> - continuously reading multiple set of data from serial com,
+> - plotting them to curve,
+> - and making camparison.
+> - with clean UI
+
+### Tool
+- Create UI and interaction functions with pyside6（QT for python）; 
+- Plot data with pyQtGraph
+- All platform supported: MacOS(tested), Linux, Windows
 
 # How to use
 
 ##  Use case on Mac
-show setting the UI:
+show setting:
 ![screenshot](resource/Full.jpg)
+
+Hide setting
+![screenshot](resource/HideSetting.jpg)
 
 diselect all the item from group2
 ![screenshot](resource/DisselectAllGroup2.jpg)
 
-Hide setting
-![screenshot](resource/HideSetting.jpg)
 =======
 
 ## The input data(serial port data stream) format is simple like this:
@@ -50,3 +58,6 @@ You can find the packaged application in the dist folder.
 [COMTool](https://github.com/neutree/COMTool)
 
 comtool is very useful tool for serial port data reading, but it's graph plugin for mac is not working. That's why I made this clean tool.
+
+[Qt for Python](https://doc.qt.io/qtforpython-6/index.html)
+[PyQtGraph](https://pyqtgraph.readthedocs.io/en/latest/)
