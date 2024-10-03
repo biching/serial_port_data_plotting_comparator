@@ -13,17 +13,17 @@
 
 ### 3. How to use
 
-####  3.1Use case on Mac
-show setting:
-![screenshot](resource/Full.jpg =600x)
+####  3.1 Use case on Mac
 
-Hide setting
-![screenshot](resource/HideSetting.jpg =600x)
+<p align = "left">    
+Show setting:<br>
+<img  src="resource/Full.jpg" width=41% />
+<br>Hide setting:<br>
+<img  src="resource/HideSetting.jpg" width=41% />
+<br>Diselect all the item from group2:<br>
+<img  src="resource/DisselectAllGroup2.jpg" width=41% />
+</p>
 
-diselect all the item from group2
-![screenshot](resource/DisselectAllGroup2.jpg =600x)
-
-=======
 
 #### 3.2 The input data(serial port data stream) format is simple like this:
 
