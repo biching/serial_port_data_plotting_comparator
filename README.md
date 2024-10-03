@@ -55,9 +55,10 @@ You can find the packaged application in the dist folder.
 ### 5. Thanks
 
 
-[COMTool](https://github.com/neutree/COMTool)
+- [COMTool](https://github.com/neutree/COMTool)
 
-comtool is very useful tool for serial port data reading, but it's graph plugin for mac is not working. That's why I made this clean tool.
+> comtool is very useful tool for serial port data reading, but it's graph plugin for mac is not working. That's why I made this clean tool.
 
-[Qt for Python](https://doc.qt.io/qtforpython-6/index.html)
-[PyQtGraph](https://pyqtgraph.readthedocs.io/en/latest/)
+- [Qt for Python](https://doc.qt.io/qtforpython-6/index.html)
+
+- [PyQtGraph](https://pyqtgraph.readthedocs.io/en/latest/)
