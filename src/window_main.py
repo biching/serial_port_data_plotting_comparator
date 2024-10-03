@@ -1,14 +1,14 @@
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtWidgets import QMainWindow
 from PySide6.QtGui import QAction, QIcon, QKeySequence
+from widget_main import Widget
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, widget):
+    def __init__(self):
         super().__init__()
         self.setWindowTitle("uartToPlot")
-        # self.centralWidget = widget
-        self.setCentralWidget(widget)
+        self.setCentralWidget(Widget(self))
 
         self.createActions()
         self.createToolBars()

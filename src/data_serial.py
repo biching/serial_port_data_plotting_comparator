@@ -1,7 +1,6 @@
 from queue import Queue
 import time
 import serial
-import numpy as np
 import threading
 import serial.tools.list_ports
 
@@ -24,7 +23,7 @@ class SerialData:
 
         # 初始化展示数据
         self._data_size = 120
-        self._data = {flag: np.zeros(self._data_size) for flag in self._data_flags}
+        self._data = {flag: [0 for i in range(self._data_size)] for flag in self._data_flags}
 
         self.idx = 0
 
@@ -107,6 +106,10 @@ class SerialData:
             return None
         return flag, item
 
+    def spread_data(self, l1):
+        for i in range(len(l1)):
+            l1[i] = l1[0]
+
     def refresh_data(self):
         for flag in self._data_flags:
             if self._queues[flag].empty():
@@ -115,7 +118,7 @@ class SerialData:
                 self._data[flag][self.idx] = self._queues[flag].get()
                 # 将第一个数据赋值给所有位置，以便图表尽早做自适应调整y轴显示范围
                 if self.idx == 0:
-                    self._data[flag].fill(self._data[flag][self.idx])
+                    self.spread_data(self._data[flag])
             else:
                 self._data[flag][:-1] = self._data[flag][1:]
                 self._data[flag][-1] = self._queues[flag].get()

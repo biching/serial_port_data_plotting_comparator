@@ -23,8 +23,8 @@ from widget_plot import CustomPlotWidget
 class Widget(QWidget):
     showSerialComboboxSignal = Signal(list)
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
         self.setWindowTitle("UART PLOT")
         self._plotWidget = CustomPlotWidget()
         self.busy = False
@@ -178,14 +178,15 @@ class Widget(QWidget):
         self.busy = False
 
     def refresh_serial_port(self):
+        print("refresh serial port")
         t = threading.Thread(target=self.detect_serial_port_process)
         t.setDaemon(True)
         t.start()
 
     def detect_serial_port_process(self):
-        self.parentWidget().statusBar().showMessage("detect serial port")
         items = self._plotWidget._serial_data.detect_serial_port()
         self.showSerialComboboxSignal.emit(items)
+        self.parentWidget().statusBar().showMessage("detect serial port")
 
     def showSerialPortCombobox(self, items):
         self._portx_box.clear()
