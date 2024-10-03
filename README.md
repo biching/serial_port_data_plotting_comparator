@@ -17,11 +17,11 @@
 
 <p align = "left">    
 Show setting:<br>
-<img  src="resource/Full.jpg" width=41% />
+<img  src="resource/Full.jpg" width=66% />
 <br>Hide setting:<br>
-<img  src="resource/HideSetting.jpg" width=41% />
+<img  src="resource/HideSetting.jpg" width=66% />
 <br>Diselect all the item from group2:<br>
-<img  src="resource/DisselectAllGroup2.jpg" width=41% />
+<img  src="resource/DisselectAllGroup2.jpg" width=66% />
 </p>
 
 
