@@ -1,31 +1,31 @@
-# serial_com_data_plotting_comparator
+## serial_com_data_plotting_comparator
 
-### Function: 
-> - continuously reading multiple set of data from serial com,
-> - plotting them to curve,
-> - and making camparison.
-> - with clean UI
+### 1. Function: 
+- continuously reading multiple set of data from serial com,
+- plotting them to curve,
+- and making camparison.
+- with clean UI
 
-### Tool
+### 2. Toolset
 - Create UI and interaction functions with pyside6（QT for python）; 
 - Plot data with pyQtGraph
 - All platform supported: MacOS(tested), Linux, Windows
 
-# How to use
+### 3. How to use
 
-##  Use case on Mac
+####  3.1Use case on Mac
 show setting:
-![screenshot](resource/Full.jpg)
+![screenshot](resource/Full.jpg =600x)
 
 Hide setting
-![screenshot](resource/HideSetting.jpg)
+![screenshot](resource/HideSetting.jpg =600x)
 
 diselect all the item from group2
-![screenshot](resource/DisselectAllGroup2.jpg)
+![screenshot](resource/DisselectAllGroup2.jpg =600x)
 
 =======
 
-## The input data(serial port data stream) format is simple like this:
+#### 3.2 The input data(serial port data stream) format is simple like this:
 
 >```shell 
 > // group 1(must)
@@ -38,7 +38,7 @@ diselect all the item from group2
 > $z2:-3257.14
 >```
 
-## Deploment for mac
+### 4. Deploment for mac
 
 Install the PyInstaller via pip with the following command:
 >```shell
@@ -52,7 +52,7 @@ Then package the application with the following command in the root directory:
 > ```
 You can find the packaged application in the dist folder.
 
-# Thanks
+### 5. Thanks
 
 
 [COMTool](https://github.com/neutree/COMTool)
