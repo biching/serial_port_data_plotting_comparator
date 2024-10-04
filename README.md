@@ -16,12 +16,10 @@
 ####  3.1 Use case on Mac
 
 <p align = "left">    
-Show setting:<br>
+select setting:<br>
+<img  src="resource/ScreenRecording.gif" width=66% />
+<br>Full setting:<br>
 <img  src="resource/Full.jpg" width=66% />
-<br>Hide setting:<br>
-<img  src="resource/HideSetting.jpg" width=66% />
-<br>Diselect all the item from group2:<br>
-<img  src="resource/DisselectAllGroup2.jpg" width=66% />
 </p>
 
 
