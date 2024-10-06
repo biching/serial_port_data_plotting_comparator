@@ -19,13 +19,12 @@ class SerialData:
     def __init__(self, data_flags):
         self._data_flags = data_flags
         self._serial_status = ConnStatus.LOSE
+        self._data_flag_initial = {flag: False for flag in self._data_flags}
         self._queues = {flag: Queue(maxsize=0) for flag in self._data_flags}
 
         # 初始化展示数据
         self._data_size = 120
-        self._data = {flag: [0 for i in range(self._data_size)] for flag in self._data_flags}
-
-        self.idx = 0
+        self._data = {flag: [0] * self._data_size for flag in self._data_flags}
 
         # serial_init
         self.com = serial.Serial()
@@ -106,23 +105,19 @@ class SerialData:
             return None
         return flag, item
 
-    def spread_data(self, l1):
-        for i in range(len(l1)):
-            l1[i] = l1[0]
+    def spread_data(self, arr, val):
+        for i in range(len(arr)):
+            arr[i] = val
 
     def refresh_data(self):
         for flag in self._data_flags:
             if self._queues[flag].empty():
-                return  # 四个flag的数据一起过来
-            if self.idx < self._data_size:
-                self._data[flag][self.idx] = self._queues[flag].get()
-                # 将第一个数据赋值给所有位置，以便图表尽早做自适应调整y轴显示范围
-                if self.idx == 0:
-                    self.spread_data(self._data[flag])
-            else:
-                self._data[flag][:-1] = self._data[flag][1:]
-                self._data[flag][-1] = self._queues[flag].get()
-        self.idx += 1
+                continue
+            new_item = self._queues[flag].get()
+            self._data[flag] = self._data[flag][1:] + [new_item]
+            if not self._data_flag_initial[flag]:
+                self.spread_data(self._data[flag], new_item)
+                self._data_flag_initial[flag] = True
 
     def detect_serial_port(self):  # 检测串口
         items = []
