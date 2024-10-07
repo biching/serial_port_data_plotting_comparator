@@ -20,6 +20,12 @@ class MainWindow(QMainWindow):
     def createToolBars(self):
         self._tool_bar = self.addToolBar("Files")
         self._tool_bar.addAction(self._new_act)
+        self._tool_bar.addSeparator()
+        self._tool_bar.addAction(self._start_act)
+        self._tool_bar.addAction(self._stop_act)
+
+        self._stop_act.setVisible(False)
+        self._start_act.setVisible(True)
 
         self.addToolBar(Qt.LeftToolBarArea, self._tool_bar)
 
@@ -33,15 +39,37 @@ class MainWindow(QMainWindow):
             triggered=self.toggle_setting,
         )
 
-        self._exit_act = QAction(
-            QIcon.fromTheme(QIcon.ThemeIcon.ApplicationExit),
-            "&ByeBye",
+        self._start_act = QAction(
+            QIcon.fromTheme(QIcon.ThemeIcon.MediaPlaybackStart),
+            "&start",
             self,
-            shortcut=QKeySequence.Quit,
-            statusTip="quit application",
-            triggered=self.close,
+            shortcut=QKeySequence.Open,
+            statusTip="start plotting",
+            triggered=self.start_plotting,
+        )
+        self._stop_act = QAction(
+            QIcon.fromTheme(QIcon.ThemeIcon.MediaPlaybackPause),
+            "&stop",
+            self,
+            shortcut=QKeySequence.Close,
+            statusTip="stop plotting",
+            triggered=self.stop_plotting,
         )
 
     @Slot()
     def toggle_setting(self):
         widget = self.centralWidget().toggle_setting()
+
+    @Slot()
+    def start_plotting(self):
+        self.statusBar().showMessage("start plotting")
+        if self.centralWidget()._plotWidget.start_plotting():
+            self._stop_act.setVisible(True)
+            self._start_act.setVisible(False)
+
+    @Slot()
+    def stop_plotting(self):
+        self.statusBar().showMessage("stop plotting")
+        if self.centralWidget()._plotWidget.stop_plotting():
+            self._stop_act.setVisible(False)
+            self._start_act.setVisible(True)

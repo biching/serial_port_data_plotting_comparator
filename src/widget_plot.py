@@ -7,7 +7,7 @@ class CustomPlotWidget(GraphicsLayoutWidget):
     def __init__(self):
         super().__init__()
         self._timer = QTimer()
-        self._timer.timeout.connect(self.reset_data)
+        self._timer.timeout.connect(self.update_data)
         self._data_flags = ["x1", "y1", "z1", "x2", "y2", "z2"]
         self._serial_data = SerialData(self._data_flags)
         self._data_item = {flag: None for flag in self._data_flags}
@@ -74,12 +74,14 @@ class CustomPlotWidget(GraphicsLayoutWidget):
             if len(self._plot_group2.items) == 0:
                 self.removeItem(self._plot_group2)
 
-    def start_plot(self):
-        self._serial_data.open_serial()
+    def start_plotting(self):
+        if not self._serial_data.open_serial():
+            return False
 
         # 定时任务，将新数据刷新到图表中
         print("parse time is set:")
         self._timer.start(self._refresh_interval_millisec)
+
         return True
 
     def set_data_refresh_interval(self, value):
@@ -91,13 +93,23 @@ class CustomPlotWidget(GraphicsLayoutWidget):
             self._timer.stop()
             self._timer.start()
 
-    def stop_plot(self):
-        self._serial_data.close_serial()
+    def stop_plotting(self):
+        print("stop timer")
         self._timer.stop()
+        print("close_serial")
+        return self._serial_data.close_serial()
 
-    def reset_data(self):
+    def update_data(self):
         # 定时更新数据，并刷入到图表中
-        self._serial_data.refresh_data()
+        self._serial_data.update_data()
+        self.set_data()
+
+    def set_data(self):
         for flag in self._serial_data._data_flags:
             if self._data_item[flag] is not None:
                 self._data_item[flag].setData(self._serial_data._data[flag])
+
+    def reset_data(self):
+        print("reset data\n")
+        self._serial_data.reset_data()
+        self.set_data()

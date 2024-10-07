@@ -38,18 +38,25 @@ select setting:<br>
 
 ### 4. Deploment for mac
 
-Install the PyInstaller via pip with the following command:
+#### 4.1 Use PyInstaller
 >```shell
+> # Install the PyInstaller via pip:
 > pip install pyinstaller
-> ```
-
-
-Then package the application with the following command in the root directory:
-> ```shell
+>
+> # Then package the application with the following command in the root directory:
 > pyinstaller --name="Serial Plotter" --windowed --icon resource/icon.icns  main.py
 > ```
 You can find the packaged application in the dist folder.
 
+#### 4.2 Use pyside6-deploy
+It compile pyside6 into diferent modules instead of whole package, so you can reduce the useless ones
+pyside6-deploy is along with pyside6, you don't need to install it separately.
+
+>```shell
+> pyside6-deploy -c pysidedeploy.spec 
+> cd src/deployment/serialPlotter.app/Contents/MacOS
+> rm QtPdf QtQml QtQmlModels QtQuick libcrypto.3.dylib QtNetwork
+> ```
 ### 5. Thanks
 
 

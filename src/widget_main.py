@@ -83,9 +83,10 @@ class Widget(QWidget):
         self._uart_layout.addRow("Baudrate", self._baudrate_box)
         self._baudrate_box.addItems(["115200", "9600"])
 
-        self._engine_button = QPushButton(self.tr("START"))
-        self._engine_button.clicked.connect(self.start_stop_engine)
-        self._uart_layout.addRow(self._engine_button)
+        # 启动按钮暂时放到最左边
+        # self._engine_button = QPushButton(self.tr("START"))
+        # self._engine_button.clicked.connect(self.start_stop_plotting)
+        # self._uart_layout.addRow(self._engine_button)
 
         self._uart_layout.setLabelAlignment(Qt.AlignLeft)
         self._uart_groupbox.setSizePolicy(QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred))
@@ -120,8 +121,8 @@ class Widget(QWidget):
     def create_selector_group(self):
 
         ## selectors-定义
-        self._selector_group1_layout = QVBoxLayout()
-        self._selector_group2_layout = QVBoxLayout()
+        self._selector_group1_layout = QHBoxLayout()
+        self._selector_group2_layout = QHBoxLayout()
         self.data_boxes = {flag: QCheckBox(flag) for flag in self._plotWidget._data_flags}
         for flag, data_box in self.data_boxes.items():
             data_box.checkStateChanged.connect(
@@ -131,17 +132,22 @@ class Widget(QWidget):
             # data_box.setChecked(True)
             if self.FlagGroup.G1.is_belong_me(flag):
                 self._selector_group1_layout.addWidget(data_box)
+                data_box.setChecked(True)
 
             if self.FlagGroup.G2.is_belong_me(flag):
                 self._selector_group2_layout.addWidget(data_box)
 
+        self._engine_button = QPushButton(self.tr("Reset Data"))
+        self._engine_button.clicked.connect(self.reset_data)
+
         ## selectors-组装
         self._selector_groupbox = QGroupBox("Data selector")
-        self._selector_layout = QHBoxLayout()
+        self._selector_layout = QVBoxLayout()
         self._selector_layout.addLayout(self._selector_group1_layout)
         self._selector_layout.addLayout(self._selector_group2_layout)
-        self._selector_groupbox.setLayout(self._selector_layout)
+        self._selector_layout.addWidget(self._engine_button)
 
+        self._selector_groupbox.setLayout(self._selector_layout)
         self._selector_groupbox.setSizePolicy(QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred))
 
     def toggle_setting(self):
@@ -159,24 +165,24 @@ class Widget(QWidget):
             self._plotWidget.renew_plot_group2(state == Qt.CheckState.Checked, flag)
         print(f"state: {state == Qt.CheckState.Checked}; flag: {flag}")
 
+    # @Slot()
+    # def start_stop_plotting(self):
+    #     if self.busy:
+    #         return
+    #     self.busy = True
+
+    #     if self._engine_button.text() == self.tr("START"):
+    #         self.parentWidget().statusBar().showMessage("Serial Connectting")
+    #         if self._plotWidget.start_plot():
+    #             self._engine_button.setText(self.tr("STOP"))
+    #             self.parentWidget().statusBar().showMessage("Serial Connected")
+    #     else:
+    #         self._plotWidget.stop_plot()
+    #         self._engine_button.setText(self.tr("START"))
+    #         self.parentWidget().statusBar().showMessage("Serial closed")
+    #     self.busy = False
+
     @Slot()
-    def start_stop_engine(self):
-        if self.busy:
-            return
-        self.busy = True
-
-        if self._engine_button.text() == self.tr("START"):
-            self.parentWidget().statusBar().showMessage("Serial Connectting")
-            if self._plotWidget.start_plot():
-                self._engine_button.setText(self.tr("STOP"))
-                self.parentWidget().statusBar().showMessage("Serial Connected")
-        else:
-            self._plotWidget.stop_plot()
-            self._engine_button.setText(self.tr("START"))
-            self.parentWidget().statusBar().showMessage("Serial closed")
-
-        self.busy = False
-
     def refresh_serial_port(self):
         print("refresh serial port")
         t = threading.Thread(target=self.detect_serial_port_process)
@@ -188,20 +194,28 @@ class Widget(QWidget):
         self.showSerialComboboxSignal.emit(items)
         self.parentWidget().statusBar().showMessage("detect serial port")
 
+    @Slot()
     def showSerialPortCombobox(self, items):
         self._portx_box.clear()
         self._portx_box.addItems(items)
         self._portx_box.setCurrentIndex(len(items) - 1)
 
+    @Slot()
     def serial_port_changed(self, idx):
         port = self._portx_box.currentText().split(" ")[0]
         self._plotWidget._serial_data.com.port = port
         self.parentWidget().statusBar().showMessage("port changed")
 
+    @Slot()
     def baudrate_changed(self, idx):
         self._plotWidget._serial_data.com.baudrate = self._baudrate_box.currentText()
         self.parentWidget().statusBar().showMessage("baudrate changed")
 
+    @Slot()
     def refresh_data_interval_changed(self, text):
         self._plotWidget.set_data_refresh_interval(int(text))
         self.parentWidget().statusBar().showMessage("data refresh interval changed")
+
+    @Slot()
+    def reset_data(self):
+        self._plotWidget.reset_data()

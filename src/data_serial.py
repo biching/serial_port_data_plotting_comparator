@@ -30,6 +30,7 @@ class SerialData:
         self.com = serial.Serial()
         self.com.port = "/dev/cu.usbserial-14130"
         self.com.baudrate = 112500
+        self.com.timeout = 0.5
 
     def open_serial(self):
         print("open serial \nport:", self.com.port)
@@ -48,23 +49,27 @@ class SerialData:
             self.serial_thread.start()
         except Exception as e:
             print("serial thread error:", e)
+            return False
 
         return True
 
     def close_serial(self):
-        print("try to close_serial:")
         try:
             self._serial_status = ConnStatus.CLOSED
-            self.serial_thread.join()
-            print("closed successfully:")
+            if self.serial_thread.is_alive():
+                print("close_serial join")
+                self.serial_thread.join()
         except Exception as e:
             print("serial thread join error:", e)
+            return False
 
         self.com.close()
         print("serial com is closed:")
+        return True
 
     def serial_read(self):
         ret = b""
+        is_data_coming = False
         while self._serial_status == ConnStatus.CONNECTED:
             n = self.com.inWaiting()
             if n:
@@ -72,6 +77,7 @@ class SerialData:
                     ret = self.com.readline()
                 except Exception as e:
                     print("readline error:", e)
+                is_data_coming = True
                 # print(ret)
                 if len(ret):
                     try:
@@ -86,9 +92,10 @@ class SerialData:
                         flag, item = data
                         if flag in self._data_flags:
                             self._queues[flag].put(item)
-        else:
-            print("flag error")
-            return None
+            else:
+                if not is_data_coming:
+                    print("waiting data")
+                    time.sleep(1)
 
     def parse_line(self, data):
         if not data.startswith("$"):
@@ -109,7 +116,7 @@ class SerialData:
         for i in range(len(arr)):
             arr[i] = val
 
-    def refresh_data(self):
+    def update_data(self):
         for flag in self._data_flags:
             if self._queues[flag].empty():
                 continue
@@ -118,6 +125,11 @@ class SerialData:
             if not self._data_flag_initial[flag]:
                 self.spread_data(self._data[flag], new_item)
                 self._data_flag_initial[flag] = True
+
+    def reset_data(self):
+        for flag in self._data_flags:
+            self._data[flag] = [0] * self._data_size
+            self._data_flag_initial[flag] = False
 
     def detect_serial_port(self):  # 检测串口
         items = []
