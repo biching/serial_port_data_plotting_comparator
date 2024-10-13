@@ -1,4 +1,4 @@
-from pyqtgraph import GraphicsLayoutWidget, mkPen
+from pyqtgraph import GraphicsLayoutWidget, mkPen, ViewBox
 from PySide6.QtCore import QTimer
 from data_serial import SerialData
 
@@ -19,6 +19,8 @@ class CustomPlotWidget(GraphicsLayoutWidget):
         self._plot_group1.addLegend(offset=(1, 1))
         self._plot_group1.showGrid(x=True, y=True)
         self._plot_group1.enableAutoRange()
+        self._plot_group1.setMouseEnabled(False, False)
+        self._plot_group1.setAutoVisible(y=True)
         self._plot_group1.setLabel(axis="left", text="y")
 
         # 预留位置
@@ -112,4 +114,6 @@ class CustomPlotWidget(GraphicsLayoutWidget):
     def reset_data(self):
         print("reset data\n")
         self._serial_data.reset_data()
+        self._plot_group1.disableAutoRange()
+        self._plot_group1.enableAutoRange()
         self.set_data()
