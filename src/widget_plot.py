@@ -33,6 +33,8 @@ class CustomPlotWidget(GraphicsLayoutWidget):
         self._plot_group2.addLegend(offset=(1, 1))
         self._plot_group2.showGrid(x=True, y=True)
         self._plot_group2.enableAutoRange()
+        # 鼠标移动会停止autoRange，需要右键恢复
+        self._plot_group2.setMouseEnabled(False, False)
         self._plot_group2.setLabel(axis="left", text="y")
 
     def get_pen(self):
@@ -114,6 +116,9 @@ class CustomPlotWidget(GraphicsLayoutWidget):
     def reset_data(self):
         print("reset data\n")
         self._serial_data.reset_data()
-        self._plot_group1.disableAutoRange()
-        self._plot_group1.enableAutoRange()
+        # 测试代码
+        self.removeItem(self._plot_group2)
+        del self._plot_group2
+        self._plot_group2 = self.create_plot_group2()
+
         self.set_data()

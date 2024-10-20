@@ -1,17 +1,17 @@
 [app]
 
 # title of your application
-title = Serial Plotter
+title = SeialPlotter
 
 # project directory. the general assumption is that project_dir is the parent directory
 # of input_file
-project_dir = /Users/ichilong/project/curve/serial_port_data_plotting_comparator/
+project_dir = /Users/ichilong/project/curve/serial_port_data_plotting_comparator/src
 
 # source file path
-input_file = /Users/ichilong/project/curve/serial_port_data_plotting_comparator/src/serialPlotter.py
+input_file = /Users/ichilong/project/curve/serial_port_data_plotting_comparator/src/main.py
 
 # directory where exec is stored
-exec_directory = /Users/ichilong/project/curve/serial_port_data_plotting_comparator/
+exec_directory = /Users/ichilong/project/curve/serial_port_data_plotting_comparator/dist
 
 # path to .pyproject project file
 project_file = 
@@ -40,10 +40,10 @@ qml_files =
 excluded_qml_plugins = 
 
 # qt modules used. comma separated
-modules = Widgets,DBus,Core,Gui
+modules = Core,Gui,DBus,Widgets
 
 # qt plugins used by the application
-plugins = platformthemes,platforms/darwin,imageformats,generic,xcbglintegrations,platforminputcontexts,styles,egldeviceintegrations,accessiblebridge,iconengines,platforms
+plugins = iconengines,imageformats,platformthemes,platforms/darwin,generic,accessiblebridge,platforminputcontexts,platforms,egldeviceintegrations,xcbglintegrations,styles
 
 [android]
 

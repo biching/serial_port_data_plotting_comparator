@@ -81,7 +81,7 @@ class Widget(QWidget):
         self._baudrate_box = QComboBox(self._uart_groupbox)
         self._baudrate_box.currentIndexChanged.connect(self.baudrate_changed)
         self._uart_layout.addRow("Baudrate", self._baudrate_box)
-        self._baudrate_box.addItems(["115200", "9600"])
+        self._baudrate_box.addItems(["9600", "115200"])
 
         # 启动按钮暂时放到最左边
         # self._engine_button = QPushButton(self.tr("START"))
@@ -165,23 +165,6 @@ class Widget(QWidget):
             self._plotWidget.renew_plot_group2(state == Qt.CheckState.Checked, flag)
         print(f"state: {state == Qt.CheckState.Checked}; flag: {flag}")
 
-    # @Slot()
-    # def start_stop_plotting(self):
-    #     if self.busy:
-    #         return
-    #     self.busy = True
-
-    #     if self._engine_button.text() == self.tr("START"):
-    #         self.parentWidget().statusBar().showMessage("Serial Connectting")
-    #         if self._plotWidget.start_plot():
-    #             self._engine_button.setText(self.tr("STOP"))
-    #             self.parentWidget().statusBar().showMessage("Serial Connected")
-    #     else:
-    #         self._plotWidget.stop_plot()
-    #         self._engine_button.setText(self.tr("START"))
-    #         self.parentWidget().statusBar().showMessage("Serial closed")
-    #     self.busy = False
-
     @Slot()
     def refresh_serial_port(self):
         print("refresh serial port")
@@ -218,4 +201,6 @@ class Widget(QWidget):
 
     @Slot()
     def reset_data(self):
+        for data_box in self.data_boxes.values():
+            data_box.setChecked(False)
         self._plotWidget.reset_data()
