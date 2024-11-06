@@ -26,14 +26,8 @@ select setting:<br>
 #### 3.2 The input data(serial port data stream) format is simple like this:
 
 >```shell 
-> // group 1(must)
-> $x1:-3257.31
-> $y1:-3257.14
-> $z1:-3257.14
-> // group 2(option)
-> $x2:-3257.31
-> $y2:-3257.14
-> $z2:-3257.14
+> $x1:8.25;y1:-7.60;z1:-8.02;x2:-1.76;y2:-2.22;z2:96.77\r\n
+> $x1:8.25;y1:-7.60;z1:-8.02;\r\n
 >```
 
 ### 4. Deploment for mac

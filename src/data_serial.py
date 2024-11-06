@@ -19,8 +19,8 @@ class SerialData:
     def __init__(self, data_flags):
         self._data_flags = data_flags
         self._serial_status = ConnStatus.LOSE
-        self._data_flag_initial = {flag: False for flag in self._data_flags}
-        self._queues = {flag: Queue(maxsize=0) for flag in self._data_flags}
+        self._data_initied = False
+        self._queue = Queue(maxsize=0)
 
         # 初始化展示数据
         self._data_size = 120
@@ -89,47 +89,49 @@ class SerialData:
                     if data is None:
                         print("parse error, data is %s" % data_get)
                     else:
-                        flag, item = data
-                        if flag in self._data_flags:
-                            self._queues[flag].put(item)
+                        self._queue.put(data)
             else:
                 if not is_data_coming:
                     print("waiting data")
                     time.sleep(1)
 
+    # example: $x1:8.25;y1:-7.60;z1:-8.02;x2:-1.76;y2:-2.22;z2:96.77\r\n
     def parse_line(self, data):
         if not data.startswith("$"):
             return None
-        items = data[1:-2].split(":")
-        if len(items) != 2:
-            print("fields num is not right")
+        items = data[1:-2].split(";")
+        if len(items) < 1:
+            print("no data")
             return None
         try:
-            flag = items[0]
-            item = float(items[1])
+            res = {}
+            for item in items:
+                k, v = item.split(":")
+                res[k] = float(v)
+            return res
         except Exception as e:
             print("format error", e)
             return None
-        return flag, item
 
     def spread_data(self, arr, val):
         for i in range(len(arr)):
             arr[i] = val
 
     def update_data(self):
-        for flag in self._data_flags:
-            if self._queues[flag].empty():
-                continue
-            new_item = self._queues[flag].get()
-            self._data[flag] = self._data[flag][1:] + [new_item]
-            if not self._data_flag_initial[flag]:
-                self.spread_data(self._data[flag], new_item)
-                self._data_flag_initial[flag] = True
+        if self._queue.empty():
+            return
+        data = self._queue.get()
+        for flag, item in data.items():
+            self._data[flag] = self._data[flag][1:] + [item]
+            if not self._data_initied:
+                print(data)
+                self.spread_data(self._data[flag], item)
+        self._data_initied = True
 
     def reset_data(self):
         for flag in self._data_flags:
             self._data[flag] = [0] * self._data_size
-            self._data_flag_initial[flag] = False
+            self._data_initied = False
 
     def detect_serial_port(self):  # 检测串口
         items = []

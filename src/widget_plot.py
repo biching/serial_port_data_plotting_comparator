@@ -112,13 +112,3 @@ class CustomPlotWidget(GraphicsLayoutWidget):
         for flag in self._serial_data._data_flags:
             if self._data_item[flag] is not None:
                 self._data_item[flag].setData(self._serial_data._data[flag])
-
-    def reset_data(self):
-        print("reset data\n")
-        self._serial_data.reset_data()
-        # 测试代码
-        self.removeItem(self._plot_group2)
-        del self._plot_group2
-        self._plot_group2 = self.create_plot_group2()
-
-        self.set_data()

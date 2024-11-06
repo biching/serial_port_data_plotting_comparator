@@ -201,6 +201,6 @@ class Widget(QWidget):
 
     @Slot()
     def reset_data(self):
-        for data_box in self.data_boxes.values():
-            data_box.setChecked(False)
-        self._plotWidget.reset_data()
+        # for data_box in self.data_boxes.values():
+        #     data_box.setChecked(False)
+        self._plotWidget._serial_data.reset_data()
